@@ -1,6 +1,6 @@
 # Qwen3-VL-2B 模型级测试
 
-本目录维护 Qwen3-VL-2B 的模型级 Test、Bench 和 Prefill Profile。模型实现与组件级入口见 [`src/inference/models/qwen3_vl_2b/`](../../src/inference/models/qwen3_vl_2b/) 及其 [README](../../src/inference/models/qwen3_vl_2b/README.md)；新模型接入步骤见根目录 [TUTORIAL.md](../../TUTORIAL.md)。
+本目录维护 Qwen3-VL-2B 的模型级 Test、Bench 和 Prefill Profile。模型实现与组件级入口见 [`src/microformer/models/qwen3_vl_2b/`](../../src/microformer/models/qwen3_vl_2b/) 及其 [README](../../src/microformer/models/qwen3_vl_2b/README.md)；新模型接入步骤见根目录 [TUTORIAL.md](../../TUTORIAL.md)。
 
 ## 固定工作负载
 

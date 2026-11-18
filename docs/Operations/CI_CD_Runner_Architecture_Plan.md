@@ -1,6 +1,6 @@
 # CI/CD 架构与操作说明
 
-- **适用仓库**：MicroInfer（Python FastAPI 推理服务）
+- **适用仓库**：MicroFormer（Python FastAPI 推理服务）
 - **自动化平台**：GitHub Actions；当前未配置 GitLab CI
 - **执行资源**：GitHub 托管 Ubuntu Runner；不使用 4090 自托管 Runner
 - **状态**：工作流定义在 `.github/workflows/ci.yml`；首次运行和仓库规则配置仍需在 GitHub 验收
@@ -19,7 +19,7 @@ Python 模型组件和模型级 Test、Bench、Profile 仍由工程师手动排�
 | CD（持续交付） | 推送 v* tag 且 CI 通过 | 检查 tag 与包版本一致；构建 wheel、sdist 和 SHA256SUMS | 创建 GitHub Release 并附上制品 |
 | 生产部署 | 当前不自动触发 | 运维人员将已审查版本部署到指定推理主机 | 手动维护窗口、GPU/权重预检和服务健康验收 |
 
-CI 的 `inference validate` 只读模型 manifest 与配置，不加载权重、不初始化 CUDA。模块级测试及模型级 Test/Bench/Profile 按各模型的 `tests/<model_name>/README.md` 手动执行。
+CI 的 `microformer validate` 只读模型 manifest 与配置，不加载权重、不初始化 CUDA。模块级测试及模型级 Test/Bench/Profile 按各模型的 `tests/<model_name>/README.md` 手动执行。
 
 CD 目前是持续交付而非持续部署：没有已确认的生产主机、制品仓库、部署凭证、服务管理方式或健康回滚接口，因此工作流不会登录服务器、重启推理服务或覆盖模型权重。确认目标环境后，再单独设计带审批、最小权限和回滚的部署 job。
 
@@ -45,7 +45,7 @@ CD 目前是持续交付而非持续部署：没有已确认的生产主机、�
 
 ### 发布版本
 
-1. 将版本号更新到 `src/inference/__init__.py` 的 `__version__`，并审查依赖、配置和变更记录。
+1. 将版本号更新到 `src/microformer/__init__.py` 的 `__version__`，并审查依赖、配置和变更记录。
 2. 合并到 main，等待两个 Python 版本的 CI 检查通过。
 3. 维护者在该提交创建匹配 tag，例如包版本为 0.1.0 时使用 `v0.1.0`。
 4. 检查 Actions 的 CI 与 Release Job 均成功；在 GitHub Release 下载 wheel、sdist 和 SHA256SUMS 并核对校验值。
@@ -55,7 +55,7 @@ CD 目前是持续交付而非持续部署：没有已确认的生产主机、�
 
 ## 5. 4090 与后续 GitLab
 
-4090 是组内 GPU 资源，不是当前 MicroInfer CI Runner。公开仓库 PR 不能触发它；模型 Test、Bench、Profile 继续按各模型的 `tests/<model_name>/README.md` 协调 GPU 后手动执行。共享 Runner 如用于组内其他私有可信任务，应由独立私有基础设施仓库管理，使用隔离执行器、资源配额和跨平台互斥；不能把 Runner 注册令牌或宿主机管理权限写入本仓库。
+4090 是组内 GPU 资源，不是当前 MicroFormer CI Runner。公开仓库 PR 不能触发它；模型 Test、Bench、Profile 继续按各模型的 `tests/<model_name>/README.md` 协调 GPU 后手动执行。共享 Runner 如用于组内其他私有可信任务，应由独立私有基础设施仓库管理，使用隔离执行器、资源配额和跨平台互斥；不能把 Runner 注册令牌或宿主机管理权限写入本仓库。
 
 GitLab CI 尚未建立。后续迁移应按同一边界重写 `.gitlab-ci.yml`，不能复制旧 Go 流水线，也不能把 GitHub Runner token 复用为 GitLab Runner 凭证。
 
@@ -66,7 +66,7 @@ GitLab CI 尚未建立。后续迁移应按同一边界重写 `.gitlab-ci.yml`�
 | GitHub Actions | CPU 静态检查、配置预检、包构建和 Release 制品 | 审查 workflow 改动，保护 main/tag 规则 |
 | Python 模型验证 | 不运行 GPU/权重测试 | 按预约执行组件/模型 Test、Bench、Profile 和 API smoke；记录硬件、revision、commit 与结果 |
 | 推理环境 | 不自动 SSH、不重启服务、不修改权重 | 维护者按目标主机流程安装、启动、验收和回滚 |
-| 4090/GitLab | 当前未接入 MicroInfer 流水线 | 由共享基础设施负责人单独评估和建设 |
+| 4090/GitLab | 当前未接入 MicroFormer 流水线 | 由共享基础设施负责人单独评估和建设 |
 
 ## 7. 来源
 

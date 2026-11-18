@@ -14,7 +14,7 @@ from transformers import AutoModelForCausalLM, AutoProcessor, BitsAndBytesConfig
 
 root = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(root / "src"))
-from inference.models.mage_vl_4b.architecture.image_encoder import _resize_image
+from microformer.models.mage_vl_4b.architecture.image_encoder import _resize_image
 
 config_path = root / "tests/mage_vl_4b/baseline/profiles/inference.yml"
 config = yaml.safe_load(config_path.read_text(encoding="utf-8"))

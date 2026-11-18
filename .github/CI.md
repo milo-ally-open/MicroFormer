@@ -1,6 +1,6 @@
 # GitHub Actions
 
-本目录维护 MicroInfer 的 GitHub CI 与版本制品交付工作流。
+本目录维护 MicroFormer 的 GitHub CI 与版本制品交付工作流。
 
 - `workflows/ci.yml`：PR/main 分支运行 CPU 静态检查、模型配置预检和 Python 包构建；`v*` tag 通过检查后创建 GitHub Release。
 - 使用 GitHub 托管 Runner，不将公开仓库代码送到共享 4090。

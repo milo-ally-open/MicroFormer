@@ -105,7 +105,7 @@ Qwen3-VL 示例信息：
 
 先进入项目环境。PyTorch/CUDA 应按目标机器的 NVIDIA 驱动和 CUDA 兼容矩阵单独安装；模型专属 Python 依赖则通过 Python 包的 **extra** 安装。extra 是一组可选依赖，例如 `qwen3-vl-2b` extra 会安装 Qwen3-VL 所需的 Python 包；它不包含模型权重，也不负责安装 PyTorch/CUDA。不同模型依赖不同，需按官方要求选择兼容版本。
 
-把模型专属依赖写入 `src/inference/models/<model_name>/requirements/requirements.txt`，并在 `src/inference/pyproject.toml` 的 optional dependencies 声明对应 extra：
+把模型专属依赖写入 `src/microformer/models/<model_name>/requirements/requirements.txt`，并在 `src/microformer/pyproject.toml` 的 optional dependencies 声明对应 extra：
 
 ```toml
 <model-extra> = { file = ["models/<model_name>/requirements/requirements.txt"] }
@@ -114,9 +114,9 @@ Qwen3-VL 示例信息：
 在仓库根目录安装当前模型 extra。新模型把 `qwen3-vl-2b` 替换成自己在 `pyproject.toml` 中声明的 extra 名称：
 
 ```bash
-cd /mnt/e/workspace/MicroInfer
+cd /mnt/e/workspace/MicroFormer
 conda activate inference
-python -m pip install -e "src/inference[qwen3-vl-2b]"
+python -m pip install -e "src/microformer[qwen3-vl-2b]"
 python -m pip check
 ```
 
@@ -664,8 +664,8 @@ print("json:", output_path)
 (直接运行文件会丢失包上下文并报 `attempted relative import with no known parent package` )
 
 ```bash
-python -m inference.models.mage_vl_4b.layers.vision_attention
-python -m inference.models.qwen3_vl_2b.layers.text_attention
+python -m microformer.models.mage_vl_4b.layers.vision_attention
+python -m microformer.models.qwen3_vl_2b.layers.text_attention
 ```
 
 按模型结构编写，不是固定清单：模型不需要的文件不要创建。出现权重 key 无法匹配、Processor 字段缺失或官方前向不支持时，先定位架构差异，不用 `strict=False` 掩盖未加载权重。
@@ -675,7 +675,7 @@ python -m inference.models.qwen3_vl_2b.layers.text_attention
 模型目录统一为下面的形状。根目录只放四个 Python 入口；YAML 放 `profiles/`，依赖放 `requirements/`；`architecture/__init__.py` 保留为空。目录内部文件依据模型能力增减：
 
 ```text
-src/inference/models/<model_name>/
+src/microformer/models/<model_name>/
 ├── README.md                  # 模型架构、模块映射、能力边界和运行说明
 ├── example.py                 # 最小实际调用示例；VLM 展示图片输入和流式输出
 ├── loader.py                  # 本模型配置读取、路径解析和 Processor/权重加载所需设置
@@ -711,7 +711,7 @@ src/inference/models/<model_name>/
 
 | 文件 | 必须说明的内容 |
 | --- | --- |
-| `src/inference/models/<model_name>/README.md` | 上游模型 ID 与 revision、API alias 和能力边界；模型前向拓扑；`architecture/`、`layers/`、`components/` 与 `modeling.py` 的职责映射；配置、依赖和最小 `example.py` 运行方法；与官方 Transformers 的实现差异或注意事项。 |
+| `src/microformer/models/<model_name>/README.md` | 上游模型 ID 与 revision、API alias 和能力边界；模型前向拓扑；`architecture/`、`layers/`、`components/` 与 `modeling.py` 的职责映射；配置、依赖和最小 `example.py` 运行方法；与官方 Transformers 的实现差异或注意事项。 |
 | `tests/<model_name>/README.md` | 运行环境、权重与输入素材；baseline/enhanced 的 `test.py`、`bench.py`、`prefill.py` 分工和运行命令；`profiles/inference.yml` 用途；JSON 输出 schema 与产物路径；`analysis.py` 读取和生成什么；验收门槛、硬件与 revision 记录方式；能力未覆盖项。 |
 
 模型级目录统一采用以下布局；各模型 README 以实际能力为准，不复制无关功能：
@@ -743,7 +743,7 @@ alias: qwen3-vl-2b
 display_name: Qwen3-VL-2B-Instruct
 integration_profile: custom
 backend: transformers
-runtime_factory: inference.models.qwen3_vl_2b.runtime:create_runtime
+runtime_factory: microformer.models.qwen3_vl_2b.runtime:create_runtime
 inference_config: inference.yml
 network_config: network.yml
 api:
@@ -783,12 +783,12 @@ api:
 启动器预检不加载权重：
 
 ```bash
-inference list
-inference validate --model <model-alias>
+microformer list
+microformer validate --model <model-alias>
 ```
 
 ```bash
-inference serve --model <model-alias>
+microformer serve --model <model-alias>
 ```
 
 端到端验收从另一个终端直接调用模型 FastAPI 的 OpenAI 兼容 `POST /v1/chat/completions`，不需要 API Key：
@@ -799,7 +799,7 @@ curl http://127.0.0.1:8012/v1/chat/completions \
   -d '{"model":"<model-alias>","messages":[{"role":"user","content":"请介绍一下这个模型。"}],"stream":true}'
 ```
 
-使用模型 manifest 中登记的 API model ID，例如 `mage-vl-4b`、`qwen3-vl-2b`。`scripts/client.py` 可验证当前两个模型的请求；新模型需将上例 URL 和 model alias 替换为自己的配置。图像、视频和工具调用能力分别准备真实请求验收，没有测过的能力必须标为 `false`。控制面负责用户认证与业务授权，并在服务端调用 FastAPI；控制面不属于本仓库。
+使用模型 manifest 中登记的 API model ID，例如 `mage-vl-4b`、`qwen3-vl-2b`。`scripts/client.py` 可验证当前两个模型的请求；新模型需将上例 URL 和 model alias 替换为自己的配置。图像、视频和工具调用能力分别准备真实请求验收，没有测过的能力必须标为 `false`。FastAPI 不负责 API Key 认证；客户端认证和接口权限由独立的 MicroGateway 提供。
 
 ## 7. 结果与复现记录
 

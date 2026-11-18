@@ -15,7 +15,7 @@ import yaml
 from PIL import Image
 from transformers import AutoModelForCausalLM, AutoProcessor, BitsAndBytesConfig, KernelConfig
 
-from inference.models.mage_vl_4b.architecture.image_encoder import _resize_image
+from microformer.models.mage_vl_4b.architecture.image_encoder import _resize_image
 
 config_path = root / "tests/mage_vl_4b/baseline/profiles/inference.yml"
 config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
@@ -27,8 +27,8 @@ alias, prompt = "mage-vl-4b", "请简要描述图片中的主要内容。"
 image_path = root / "test.jpg"
 cuda = torch.cuda.is_available()
 dtype = getattr(torch, str(model_settings["dtype"]))
-profile_mode = os.environ.get("INFERENCE_PROFILE_MODE", "torch").strip().lower()
-if profile_mode not in {"torch", "external"}: raise ValueError("INFERENCE_PROFILE_MODE 只支持 torch 或 external。")
+profile_mode = os.environ.get("MICROFORMER_PROFILE_MODE", "torch").strip().lower()
+if profile_mode not in {"torch", "external"}: raise ValueError("MICROFORMER_PROFILE_MODE 只支持 torch 或 external。")
 activities = [torch.profiler.ProfilerActivity.CPU] + ([torch.profiler.ProfilerActivity.CUDA] if cuda and profile_mode == "torch" else [])
 trace_suffix = "-external" if profile_mode == "external" else ""
 

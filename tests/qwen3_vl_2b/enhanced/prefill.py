@@ -10,17 +10,17 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(root / "src"))
 config_path = root / "tests/qwen3_vl_2b/enhanced/profiles/inference.yml"
-model_config_path = root / "src/inference/models/qwen3_vl_2b/profiles/model.yml"
-network_config_path = root / "src/inference/models/qwen3_vl_2b/profiles/network.yml"
-os.environ.update({"INFERENCE_PROJECT_ROOT": str(root), "INFERENCE_MODEL_ALIAS": "qwen3-vl-2b", "INFERENCE_MODEL_MANIFEST": str(model_config_path), "INFERENCE_CONFIG": str(config_path), "INFERENCE_NETWORK_CONFIG": str(network_config_path), "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1"})
+model_config_path = root / "src/microformer/models/qwen3_vl_2b/profiles/model.yml"
+network_config_path = root / "src/microformer/models/qwen3_vl_2b/profiles/network.yml"
+os.environ.update({"MICROFORMER_PROJECT_ROOT": str(root), "MICROFORMER_MODEL_ALIAS": "qwen3-vl-2b", "MICROFORMER_MODEL_MANIFEST": str(model_config_path), "MICROFORMER_CONFIG": str(config_path), "MICROFORMER_NETWORK_CONFIG": str(network_config_path), "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1"})
 
 import torch
 import yaml
 from PIL import Image
 from transformers import AutoProcessor
 
-from inference.engine.sequence import ExecutionPhase, ScheduledWorkItem
-from inference.models.qwen3_vl_2b.runtime import create_runtime
+from microformer.engine.sequence import ExecutionPhase, ScheduledWorkItem
+from microformer.models.qwen3_vl_2b.runtime import create_runtime
 
 config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
 model_path = (root / config["runtime"]["local_model_path"]).resolve()

@@ -13,7 +13,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: microinfer-${{ github.workflow }}-${{ github.ref }}
+  group: microformer-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -37,13 +37,13 @@ jobs:
       - name: Install build tools and package core dependencies
         run: |
           python -m pip install --upgrade pip build
-          python -m pip install --editable src/inference
+          python -m pip install --editable src/microformer
       - name: Check Python syntax
-        run: python -m compileall -q src/inference scripts
+        run: python -m compileall -q src/microformer scripts
       - name: Validate model manifests and runtime profiles
-        run: inference validate --model mage-vl-4b --model qwen3-vl-2b
+        run: microformer validate --model mage-vl-4b --model qwen3-vl-2b
       - name: Build package distributions
-        run: python -m build --sdist --wheel --outdir dist src/inference
+        run: python -m build --sdist --wheel --outdir dist src/microformer
 
   release:
     name: Publish GitHub Release assets
@@ -71,7 +71,7 @@ jobs:
           import os
           from pathlib import Path
 
-          module = ast.parse(Path('src/inference/__init__.py').read_text(encoding='utf-8'))
+          module = ast.parse(Path('src/microformer/__init__.py').read_text(encoding='utf-8'))
           version = next(
               ast.literal_eval(node.value)
               for node in module.body
@@ -84,7 +84,7 @@ jobs:
       - name: Build release distributions and checksums
         run: |
           python -m pip install --upgrade pip build
-          python -m build --sdist --wheel --outdir dist src/inference
+          python -m build --sdist --wheel --outdir dist src/microformer
           sha256sum dist/* > dist/SHA256SUMS
       - name: Create GitHub Release
         env:

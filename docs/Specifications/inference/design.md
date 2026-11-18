@@ -128,7 +128,7 @@ Mage-VL 与 Qwen 均由共用入口装配；两个模型的 `example.py`、`load
 
 ## 嵌入式 Engine 的 YAML 选择
 
-模型插件的 `create_engine_client()` 可接收可选 `inference_config_path` 和 `network_config_path`。插件 manifest 仍决定模型 alias、Runtime 和 API 能力；传入路径只覆盖两份运行 YAML。未传入时沿用模型根目录 manifest 中声明的配置文件名。显式绝对路径直接使用，显式相对路径相对调用进程当前工作目录解析。工厂在返回 Engine client 前读取两份 YAML 并校验顶层 mapping，再把规范化路径和 manifest 写入 Worker 子进程将继承的环境。模型 YAML 中相对 checkpoint 路径仍由 `INFERENCE_PROJECT_ROOT` 解析。配置选择或 YAML 校验失败时，不启动 Engine Core、Worker 或模型加载。
+模型插件的 `create_engine_client()` 可接收可选 `inference_config_path` 和 `network_config_path`。插件 manifest 仍决定模型 alias、Runtime 和 API 能力；传入路径只覆盖两份运行 YAML。未传入时沿用模型根目录 manifest 中声明的配置文件名。显式绝对路径直接使用，显式相对路径相对调用进程当前工作目录解析。工厂在返回 Engine client 前读取两份 YAML 并校验顶层 mapping，再把规范化路径和 manifest 写入 Worker 子进程将继承的环境。模型 YAML 中相对 checkpoint 路径仍由 `MICROFORMER_PROJECT_ROOT` 解析。配置选择或 YAML 校验失败时，不启动 Engine Core、Worker 或模型加载。
 
 默认 Runner 以 `AutoModelForCausalLM` 加载固定 revision，仅支持单一计算设备，并优先使用 CUDA；CUDA 不可用时回退 CPU。模型类型仍限 decoder-only causal LM、可重用 `past_key_values`、文字 `chat_template` 和 token ID 输出。API 处理器只接收文字，不接受图片、视频或 Live。Scheduler 提交的 `execute_batch()` 仍按 request 逐项调用 forward，各 request 的 Cache／生成状态分开持有；这是可用的标准接入路径，不代表连续批次 forward、实体 block cache 或 PagedAttention。
 

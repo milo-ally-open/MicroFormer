@@ -1,6 +1,6 @@
 # Mage-VL-4B 模型级测试
 
-本目录维护 Mage-VL-4B 的模型级 Test、Bench 和 Prefill Profile。模型实现及组件级入口见 [`src/inference/models/mage_vl_4b/`](../../src/inference/models/mage_vl_4b/) 和该目录的 [README](../../src/inference/models/mage_vl_4b/README.md)；新模型接入步骤见根目录 [TUTORIAL.md](../../TUTORIAL.md)。
+本目录维护 Mage-VL-4B 的模型级 Test、Bench 和 Prefill Profile。模型实现及组件级入口见 [`src/microformer/models/mage_vl_4b/`](../../src/microformer/models/mage_vl_4b/) 和该目录的 [README](../../src/microformer/models/mage_vl_4b/README.md)；新模型接入步骤见根目录 [TUTORIAL.md](../../TUTORIAL.md)。
 
 ## 固定工作负载
 
@@ -11,7 +11,7 @@
 | 输入 | 仓库根目录 `test.jpg` 和固定中文图像问题 |
 | 生成长度 | 2 token，greedy decoding |
 | 推理设备 | CUDA 可用时使用 CUDA；只有 CUDA 不可用时回退 CPU |
-| Profile 模式 | PyTorch Profiler；可设 `INFERENCE_PROFILE_MODE=external` 准备 Nsight 外部采集 |
+| Profile 模式 | PyTorch Profiler；可设 `MICROFORMER_PROFILE_MODE=external` 准备 Nsight 外部采集 |
 
 先按各自 `profiles/inference.yml` 准备固定 revision 的本地权重。脚本启用离线加载，不负责下载权重。视频上传与 Live 视频不属于本目录的图片 workload。
 

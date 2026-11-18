@@ -9,18 +9,18 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[3]
 sys.path.insert(0, str(root / "src"))
 config_path = root / "tests/mage_vl_4b/enhanced/profiles/inference.yml"
-model_config_path = root / "src/inference/models/mage_vl_4b/profiles/model.yml"
-network_config_path = root / "src/inference/models/mage_vl_4b/profiles/network.yml"
-os.environ.update({"INFERENCE_PROJECT_ROOT": str(root), "INFERENCE_MODEL_ALIAS": "mage-vl-4b", "INFERENCE_MODEL_MANIFEST": str(model_config_path), "INFERENCE_CONFIG": str(config_path), "INFERENCE_NETWORK_CONFIG": str(network_config_path), "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1"})
+model_config_path = root / "src/microformer/models/mage_vl_4b/profiles/model.yml"
+network_config_path = root / "src/microformer/models/mage_vl_4b/profiles/network.yml"
+os.environ.update({"MICROFORMER_PROJECT_ROOT": str(root), "MICROFORMER_MODEL_ALIAS": "mage-vl-4b", "MICROFORMER_MODEL_MANIFEST": str(model_config_path), "MICROFORMER_CONFIG": str(config_path), "MICROFORMER_NETWORK_CONFIG": str(network_config_path), "HF_HUB_OFFLINE": "1", "TRANSFORMERS_OFFLINE": "1"})
 
 import torch
 import yaml
 from PIL import Image
 from transformers import AutoProcessor
 
-from inference.engine.sequence import ExecutionPhase, ScheduledWorkItem
-from inference.models.mage_vl_4b.architecture.image_encoder import _resize_image
-from inference.models.mage_vl_4b.runtime import create_runtime
+from microformer.engine.sequence import ExecutionPhase, ScheduledWorkItem
+from microformer.models.mage_vl_4b.architecture.image_encoder import _resize_image
+from microformer.models.mage_vl_4b.runtime import create_runtime
 
 config = yaml.safe_load(config_path.read_text(encoding="utf-8"))
 model_settings = config["model"]

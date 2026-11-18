@@ -12,6 +12,7 @@
 - **AC-01.5** Mage-VL Worker 既有 `text_delta` 路径仍转成相同 OpenAI SSE schema；不得要求 Mage-VL 改用 Qwen tokenizer 或 token ID。
 - **AC-01.6** API 客户端断线时，原有取消 IPC 与 shielded cleanup 仍生效；取消后不得继续向该 stream 发送 token。
 - **AC-01.7** Qwen 非流式聊天响应由 API Server 将 Worker 返回的 token ID 序列解码为 OpenAI `content`；Worker 不产生对外聊天字符串。
+- **AC-01.8** 视频上传理解接口为 `POST /v1/video/understanding`；Mage-VL 实时流通过 `POST /v1/video/stream` 创建会话、`GET /v1/video/stream/{id}/events` 接收 SSE 事件及 `DELETE /v1/video/stream/{id}` 停止会话。
 
 ### REQ-02：L2 Engine Core 统一管理请求执行闭环
 
@@ -58,7 +59,7 @@
 - **AC-07.4** FastAPI 直接提供模型 API，不要求 Bearer API Key，也不执行 tenant 识别或 tenant 级请求限流。
 - **AC-07.5** `/health` 和 `/v1/*` 接口可在不提供 API Key 的情况下访问；部署通过受控网络限制 API 的访问范围。MediaMTX 回调只允许有效的活动推流路径。
 - **AC-07.6** Live 会话使用随机生成的会话 ID；服务启动不依赖 API Key 或 Live HMAC 密钥文件。
-- **AC-07.7** 模型 API 由 `inference serve --model <model-alias>` 直接启动，Network 层保留请求格式、输入大小和模型能力校验。
+- **AC-07.7** 模型 API 由 `microformer serve --model <model-alias>` 直接启动，Network 层保留请求格式、输入大小和模型能力校验。
 
 ### REQ-08：以精简的逐模型测试验证模型接入
 
@@ -186,7 +187,7 @@
 **验收条件**
 
 - **AC-19.1** `network/` 根目录直接包含 `app.py`、`service.py`、schemas／serializers／tool calling、聊天／视频／Live 路由及 API 输入／输出处理器；不再存在 `api/` package 或上述四个嵌套子 package。
-- **AC-19.2** `launcher.py` 加载 `inference.network.service`；模型 Processor 与 tool adapter 依赖 `inference.network` 稳定接口，不依赖旧 `inference.api` 导入路径。
+- **AC-19.2** `launcher.py` 加载 `microformer.network.service`；模型 Processor 与 tool adapter 依赖 `microformer.network` 稳定接口，不依赖旧 `inference.api` 导入路径。
 - **AC-19.3** 健康检查、模型列表、聊天 JSON/SSE、工具调用协议、视频及 Live 路由的路径、schema、能力门控和 Engine IPC 行为保持不变；API 程序不加载模型 Runner 或 GPU Runtime。
 - **AC-19.4** 双模型 Launcher `list`／`validate`、Network 模块导入与 FastAPI route/schema smoke、逐模型组件检查及 README／design／AGENTS 当前路径说明通过。
 
@@ -198,8 +199,8 @@
 
 **验收条件**
 
-- **AC-20.1** `src/inference/processors/` 提供共用 `video.py` 与 `live_sessions.py`；`src/inference/media/` 不再存在，源码、工厂路径和模块 imports 不引用旧 package。
-- **AC-20.2** Network、Engine、Mage-VL 通过 `inference.processors` 使用共用视频与 Live 组件；上传视频临时文件处理、视频元数据／采样辅助和 Live session manager 行为保持不变。
+- **AC-20.1** `src/microformer/processors/` 提供共用 `video.py` 与 `live_sessions.py`；`src/microformer/media/` 不再存在，源码、工厂路径和模块 imports 不引用旧 package。
+- **AC-20.2** Network、Engine、Mage-VL 通过 `microformer.processors` 使用共用视频与 Live 组件；上传视频临时文件处理、视频元数据／采样辅助和 Live session manager 行为保持不变。
 - **AC-20.3** Processor package 的职责边界在 AGENTS、Inference README 与设计文件中说明为跨模型共用扩展点；模型专属 tokenizer、输入转换与视觉处理仍留在各自模型包。
 - **AC-20.4** 双模型 Launcher `list`／`validate`、共享 processor 导入、Network app 导入、逐模型组件检查及 Spec validator 通过。
 
@@ -273,7 +274,7 @@
 
 **验收条件**
 
-- **AC-23.1** `inference serve --model <model-alias>` 依据模型 manifest 与 `profiles/network.yml` 启动模型 FastAPI；`/health` 保持健康探测，模型 API 使用标准 `/v1/*` 路径。
+- **AC-23.1** `microformer serve --model <model-alias>` 依据模型 manifest 与 `profiles/network.yml` 启动模型 FastAPI；`/health` 保持健康探测，模型 API 使用标准 `/v1/*` 路径。
 - **AC-23.2** `/v1/*` 推理接口不要求 Bearer API Key；请求仍经过模型、格式和输入限制校验。MediaMTX 回调检查活动会话推流路径。
 - **AC-23.3** 服务启动不需要 API Key 文件、tenant 配置或 HMAC 密钥；Live 会话使用随机会话 ID。
 - **AC-23.4** API model ID 来自模型 manifest（当前 Mage-VL 为 `mage-vl-4b`，Qwen3-VL 为 `qwen3-vl-2b`）。

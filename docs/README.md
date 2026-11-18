@@ -9,7 +9,7 @@
 | 了解项目并启动服务 | [根 README](../README.md) | 项目边界、已登记模型、安装、启动和文档入口 |
 | 从 Hugging Face 接入一个新模型 | [新模型接入流程](../TUTORIAL.md) | 固定 revision、下载快照、模型包目录、依赖、配置、Runtime 及分层验收 |
 | 贡献代码或修改文档 | [仓库维护约定](../AGENTS.md) | 架构边界、注释和文档写法、验证证据与安全要求 |
-| 直接运行 Python 推理 API | [Inference README](../src/inference/README.md) | FastAPI、模型插件、安装和服务端用法 |
+| 直接运行 Python 推理 API | [Inference README](../src/microformer/README.md) | FastAPI、模型插件、安装和服务端用法 |
 | 查看当前 CI/CD 和 Runner 边界 | [CI/CD 架构与操作说明](Operations/CI_CD_Runner_Architecture_Plan.md) | Python CPU 校验、GitHub Release 制品、手动 GPU 验收及未来共享 Runner 边界 |
 | 运行模型组件、性能或端到端验收 | 对应模型的 `tests/<model_name>/README.md` | 该模型的测试前置条件、运行命令、产物和验收要求；入口链接见根目录 README |
 | 部署实时媒体 sidecar | [MediaMTX README](../deploy/mediamtx/README.md) | 独立部署、回调配置和模型网络端点的对应关系 |
@@ -21,7 +21,6 @@
 | 子系统 | 设计文档 | 适用范围 |
 | --- | --- | --- |
 | Inference | [提案](Specifications/inference/proposal.md)、[技术设计](Specifications/inference/design.md)、[接口规格](Specifications/inference/spec.md)、[实施记录](Specifications/inference/tasks.md) | Engine、模型 Runtime、API 契约和能力声明；新模型接入按根目录 [流程文档](../TUTORIAL.md) 执行 |
-| Cloud VLM 控制面（规划） | [提案](Specifications/control-plane/proposal.md)、[行为规格](Specifications/control-plane/spec.md)、[技术设计](Specifications/control-plane/design.md)、[实施任务](Specifications/control-plane/tasks.md) | 未来独立产品后端与 MicroInfer 的对接；不包含在本仓库实现 |
 
 这些规格包含历史方案和阶段性验收记录。它们解释决策与当时的验证结果，不自动代表当前实现；涉及端口、字段、能力和限制时，先核对当前代码与 YAML。历史测试结果应保留其模型 revision、硬件、配置和采集日期，不要当作当前性能承诺。
 
